@@ -1,0 +1,136 @@
+[
+    {
+        "output": "yes",
+        "input": [
+            "yes",
+            "do it",
+            "sure",
+            "exactly",
+            "confirm",
+            "of course",
+            "sounds good",
+            "that's correct",
+            "I don't mind",
+            "I agree"
+        ]
+    },
+    {
+        "output": "no",
+        "input": [
+            "no",
+            "don't do it",
+            "definitely not",
+            "not really",
+            "thanks but no",
+            "not interested",
+            "I don't think so",
+            "I disagree",
+            "I don't want that"
+        ]
+    },
+    {
+        "output": "later",
+        "input": [
+            "later",
+            "not yet",
+            "ask me later",
+            "not ",
+            "next time",
+            "I said later",
+            "some other time",
+            "do it later",
+            "not at the moment",
+            "not at this time"
+        ]
+    },
+    {
+        "output": "cancel",
+        "input": [
+            "cancel",
+            "stop",
+            "dismiss",
+            "skip",
+            "forget that",
+            "stop it",
+            "never mind",
+            "do nothing",
+            "just forget about it",
+            "cancel that"
+        ]
+    },
+    {
+        "output": "more",
+        "input": [
+            "more",
+            "more results",
+            "anything else",
+            "other results",
+            "what else",
+            "are there more",
+            "tell me more",
+            "show me more",
+            "more information"
+        ]
+    },
+    {
+        "output": "next",
+        "input": [
+            "next",
+            "next page",
+            "go forward",
+            "show me next",
+            "following result",
+            "switch to the next",
+            "go to the next page",
+            "read the next results",
+            "show me the next page",
+            "show me the following results"
+        ]
+    },
+    {
+        "output": "previous",
+        "input": [
+            "back",
+            "previous",
+            "go back",
+            "previous page",
+            "previous results",
+            "return to the previous",
+            "return to previous page",
+            "go to the previous page",
+            "go back to previous results",
+            "read out the previous results"
+        ]
+    },
+    {
+        "output": "repeat",
+        "input": [
+            "repeat",
+            "repeat it",
+            "come again",
+            "do it again",
+            "say it again",
+            "say the same again",
+            "please repeat that",
+            "repeat these results",
+            "could you repeat that",
+            "repeat what you've just said",
+            "what"
+        ]
+    },
+    {
+        "output": "select.number",
+        "input": [
+            "second",
+            "I choose number 3",
+            "see 1 2 3 4 and 5",
+            "number 4 5 7 and 8",
+            "select the first one",
+            "show me the second one",
+            "choose 1st and 2nd one",
+            "choose numbers 1 2 3 and 5",
+            "the 1st one and the 2nd one",
+            "I select number 2 and number 5"
+        ]
+    }
+]

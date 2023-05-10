@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,300;1,400;1,600;1,700;1,800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap');
+
+body {
+  background: #E4E4E4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 !important;
+}
+
+.email-box {
+  width: 70%;
+  height: auto;
+  background: linear-gradient(26deg, #0d96f2, #382c89 87%);
+}
+
+.email-header {
+  height: 123px;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  padding-left: 5%;
+  font-family: caveat;
+  font-size: 41px;
+  color: white;
+  font-weight: 900;
+}
+
+.email-content {
+  height: auto;
+  background: white;
+}
+
+.email-content-container {
+  padding: 5%;
+}
+
+.email-subject {
+  font-family: Open Sans;
+  font-weight: 900;
+  font-size: 25px;
+}
+
+.email-text {
+  padding: 5% 0%;
+}
+
+.email-text p {
+  font-family: Open Sans;
+  font-weight: 300;
+  font-size: 20px;
+  color: #000000;
+  margin-bottom: 5%;
+}
+
+.email-btn {
+  width: 100%;
+  height: 60px;
+  background: linear-gradient(26deg, #0d96f2, #382c89 87%);
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.email-btn-text {
+  font-family: Open sans;
+  font-weight: bold;
+  color: white;
+  font-size: 18px;
+}
+
+.email-footer {
+  height: 160px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0% 5%;
+  align-items: center;
+}
+
+.footer-logo {
+  font-family: caveat;
+  font-size: 39px;
+  color: white;
+  font-weight: bold;
+}
+
+.footer-text {
+  margin: 4px;
+  font-size: 10px;
+  font-weight: 100;
+  font-family: Open Sans;
+  color: white;
+}
+
+.footer-social-media {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.social-icons {
+  display: flex;
+  margin-bottom: 5px;
+}
+
+.icon {
+  width: 35px;
+  height: 35px;
+  margin-right: 5px;
+}

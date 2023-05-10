@@ -1,0 +1,234 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('api:server');
+var http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '8000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+app.set('server', server);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
+
+/**
+ * Create socket
+ */
+
+const jwt = require('jsonwebtoken');
+const io = require("socket.io")(server);
+var SocketEvent = require('../socket');
+var SocketAssistant = require('../controllers/SocketAssistant');
+var SocketCollaboration = require('../controllers/SocketCollaboration');
+var userController = require('../controllers/UserController');
+const config = require("../bin/auth.config.js");
+const { response } = require('express');
+const PresentationController = require('../controllers/PresentationController');
+
+// version using the logged user from localStorage in the frontend
+io.of('/live').use((socket, next) => {
+  let token = socket.handshake.query.token;
+  let slug = socket.handshake.query.slug;
+  let user = {
+    id: socket.handshake.query.id,
+    userName: socket.handshake.query.userName,
+    profilePicture: socket.handshake.query.profilePicture || 'https://i2.wp.com/avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/BF-10.png?ssl=1',
+    presenter: false,
+  }
+
+  if (!token || token === undefined)
+    return next(new Error("NO_LOGIN"));
+  else {
+    jwt.verify(token, config.secret, (err, decoded) => {
+      if (err) {
+        return next(new Error("TOKEN_NOT_VALID"));
+      }
+
+      if (user.id === decoded.id) { // extra security to check if the user is the owner of the token (even if the token payload can easily be decoded by the user)
+        SocketEvent.checkPresentationOwner(slug).then((presentation, err) => {
+          if (presentation) {
+            // common part for all users
+            let presenter = { // to have the same structure as normal presentations
+              userName: presentation.user.userName || '',
+              profilePicture: presentation.user.profilePicture
+            }
+            // we select just the data that the other users should see
+            socket.presentationInfo = {
+              name: presentation.name,
+              user: presenter,
+              slides: (presentation.slides !== undefined && presentation.slides !== undefined) ? [presentation.slides[0]] : []
+            }
+            
+            // case the user is the owner
+            if (presentation.user.id === user.id) {
+              user.presenter = true;
+              socket.presentation = presentation;
+              // user owner of the presentation enters directly
+              socket.userId = decoded.id;
+              socket.user = user;
+              socket.videos = [];
+              return next();
+            } else { // case where the user is not the owner
+              // checking if user is invited
+              SocketEvent.checkUserInvitationLive(user.id, presentation._id).then((invitation, err) => {
+                if (invitation.length) {
+                  socket.userId = decoded.id;
+                  socket.user = user;
+                  return next();
+                }
+                else {
+                  return next(new Error("PRIVATE"));
+                }
+              })
+            }
+          }
+        });
+      }
+    });
+  }
+}).on('connection', (client) => {
+  SocketEvent.load_livePresentation_events(client);
+});
+
+io.of('/assistant').use((socket, next) => {
+  let token = socket.handshake.query.token;
+
+  if (!token || token === undefined)
+    return next(new Error("NO_LOGIN"));
+  else {
+    jwt.verify(token, config.secret, (err, decoded) => {
+      if (err) {
+        return next(new Error("TOKEN_NOT_VALID"));
+      }
+
+      userController.checkUserValid(decoded.id).then((user, err) => {
+        if (err || user === null) {
+          return next(new Error("ERROR_FINDING_USER"));
+        }
+
+        if (user !== null) {
+          socket.user = user
+          return next()
+        }
+      });
+    });
+  }
+}).on('connection', (client) => {
+  console.log('connection to ', client.user)
+  SocketAssistant.load_assistant_logic(client)
+});
+
+io.of('/editor/2D').use((socket, next) => {
+  let token = socket.handshake.query.token;
+  let slug = socket.handshake.query.slug;
+  let user = {
+    id: socket.handshake.query.id,
+    userName: socket.handshake.query.userName,
+    profilePicture: {
+      overview: socket.handshake.query.profilePicture || 'https://i2.wp.com/avatar-management--avatars.us-west-2.prod.public.atl-paas.net/initials/BF-10.png?ssl=1'
+    },
+  }
+
+  if (!token || token === undefined)
+    return next(new Error("NO_LOGIN"));
+  else {
+    jwt.verify(token, config.secret, (err, decoded) => {
+      if (err) {
+        return next(new Error("TOKEN_NOT_VALID"));
+      }
+
+      // TODO add user check for rights
+      socket.user = user
+      socket.slug = slug
+      return next()
+    });
+  }
+}).on('connection', (client) => {
+  SocketCollaboration.load_collaboration_logic(client)
+});
+
+// const tf = require('@tensorflow/tfjs'); // not used for now
+// const aiCore = require("../AICore/AICore");
+// aiCore.trainClassifier().then(() => console.log('finished'));
+// aiCore.runClassifier();
+// aiCore.convertKerasMode
